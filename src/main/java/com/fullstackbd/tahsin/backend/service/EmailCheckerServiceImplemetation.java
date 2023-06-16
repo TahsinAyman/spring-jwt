@@ -6,12 +6,14 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class EmailCheckerServiceImplemetation implements EmailCheckerService {
 	public Boolean checkEmailExists(String email) {
-		String apiUrl = "http://localhost:8000/?email=" + email;
+		String apiUrl = "http://192.168.0.122:8000/?email=" + email;
+		System.out.println(apiUrl);
 		try {
 			URL url = new URL(apiUrl);
 			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -27,6 +29,7 @@ public class EmailCheckerServiceImplemetation implements EmailCheckerService {
 					response.append(line);
 				}
 				reader.close();
+				System.out.println(response.toString());
 				if (response.toString().equals("true")) {
 					return true;
 				} else {
@@ -39,4 +42,10 @@ public class EmailCheckerServiceImplemetation implements EmailCheckerService {
 			return false;
 		}
 	}
+//	@Autowired
+//	private EmailVerifierClient emailVerifierClient;
+//	public Boolean checkEmailExists(String email) {
+//		System.out.println(emailVerifierClient.verifyEmail("mail4tahsin@gmail.com"));
+//		return emailVerifierClient.verifyEmail(email);
+//	}
 }

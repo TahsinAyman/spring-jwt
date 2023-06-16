@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.time.chrono.Chronology;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -60,21 +61,25 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		final String username;
 		
 		if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+			response.setStatus(HttpStatus.UNAUTHORIZED.value());
 			filterChain.doFilter(request, response);
 			return;
 		}
 		
 		jwt = authHeader.substring(7);
 		username = jwtService.extractUsername(jwt);
-		
+		System.out.println(username);
 		if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 			UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 			if (jwtService.isTokenValid(jwt, userDetails)) {
 				UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
 				authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 				SecurityContextHolder.getContext().setAuthentication(authToken);
+			} else {
+				response.setStatus(HttpStatus.UNAUTHORIZED.value());
 			}
-
+		} else {
+			response.setStatus(HttpStatus.UNAUTHORIZED.value());
 		}
 		filterChain.doFilter(request, response);
 	}

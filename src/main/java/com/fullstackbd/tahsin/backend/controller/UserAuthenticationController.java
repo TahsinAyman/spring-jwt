@@ -33,6 +33,7 @@ public class UserAuthenticationController {
         try {
 			userAuthenticationService.register(user, emailVerifyUrl);
 		} catch (Exception e) {
+			e.printStackTrace();
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
 					Message
 						.builder()
